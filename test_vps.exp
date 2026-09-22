@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70 "cd ~/zeroleakinfra && curl -v http://localhost:3000/api/me"
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect eof

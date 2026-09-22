@@ -1,0 +1,25 @@
+#!/usr/bin/expect -f
+set timeout 60
+
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect "*# "
+
+send "cd /root/zeroleakinfra\r"
+expect "*# "
+
+send "find . -name '._*' -delete\r"
+expect "*# "
+
+send "docker compose restart api worker\r"
+expect "*# "
+
+send "sleep 5\r"
+expect "*# "
+
+send "docker compose logs --tail=20 api\r"
+expect "*# "
+
+send "exit\r"
+expect eof

@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70 "curl -I 'http://localhost:3000/api/shopify/install?shop=kelme-india.myshopify.com'"
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect eof

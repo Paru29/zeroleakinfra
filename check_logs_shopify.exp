@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70 "cd ~/zeroleakinfra && docker compose logs --tail=100 api"
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect eof

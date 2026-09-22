@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect "*# "
+send "cat /etc/nginx/sites-enabled/*\r"
+expect "*# "
+send "exit\r"
+expect eof

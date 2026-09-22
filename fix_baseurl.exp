@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 60
+
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect "*# "
+
+send "cd /root/zeroleakinfra\r"
+expect "*# "
+
+send "echo 'BASE_URL=https://track.zeroleakinfra.tech' >> .env\r"
+expect "*# "
+
+send "sed -i '/- META_APP_SECRET=\\\${META_APP_SECRET}/a \\      - BASE_URL=\\\${BASE_URL}' docker-compose.yml\r"
+expect "*# "
+
+send "docker compose up -d\r"
+expect "*# "
+
+send "exit\r"
+expect eof

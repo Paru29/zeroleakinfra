@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 60
+
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect "*# "
+
+send "cd /root/zeroleakinfra\r"
+expect "*# "
+
+send "docker compose ps\r"
+expect "*# "
+
+send "docker compose logs --tail=50 api\r"
+expect "*# "
+
+send "systemctl status nginx --no-pager\r"
+expect "*# "
+
+send "exit\r"
+expect eof

@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70 "rm -f cookie.txt && curl -v -c cookie.txt -d 'username=admin&password=admin@123' http://localhost:3000/login && curl -v -b cookie.txt http://localhost:3000/api/admin/clients"
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect eof

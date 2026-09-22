@@ -1,0 +1,31 @@
+#!/usr/bin/expect -f
+set timeout 300
+
+spawn scp -o StrictHostKeyChecking=no zeroleak_deploy.tar.gz root@187.127.152.70:/root/
+expect {
+    "*assword:*" {
+        send "REDACTED_PASSWORD\r"
+        exp_continue
+    }
+    eof
+}
+
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect "*# "
+
+send "tar -xzf /root/zeroleak_deploy.tar.gz -C /root/zeroleakinfra\r"
+expect "*# "
+
+send "cd /root/zeroleakinfra\r"
+expect "*# "
+
+send "find . -name '._*' -delete\r"
+expect "*# "
+
+send "docker compose up -d --build\r"
+expect "*# "
+
+send "exit\r"
+expect eof

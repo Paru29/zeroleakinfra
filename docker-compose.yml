@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: zeroleak_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-zeroleak}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      # Expose only to localhost on VPS for security
+      - "127.0.0.1:5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: zeroleak_redis
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+
+  api:
+    build: .
+    container_name: zeroleak_api
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      # App listens on 3000, exposed to VPS host on 3000
+      - "127.0.0.1:3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-zeroleak}
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
+      - SESSION_SECRET=${SESSION_SECRET}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - META_APP_ID=${META_APP_ID}
+      - META_APP_SECRET=${META_APP_SECRET}
+      - BASE_URL=${BASE_URL}
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+    restart: unless-stopped
+    command: sh -c "npx knex migrate:latest && npm start"
+
+  worker:
+    build: .
+    container_name: zeroleak_worker
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-zeroleak}
+      - REDIS_URL=redis://redis:6379
+    restart: unless-stopped
+    command: node src/workers/capi.worker.js
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: zeroleak_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@zeroleakinfra.tech}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin@123}
+      PGADMIN_CONFIG_SCRIPT_NAME: "'/pgadmin'"
+    ports:
+      - "127.0.0.1:5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:

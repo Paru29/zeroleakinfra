@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ZeroLeak Billing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' } } }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg class="h-8 w-8 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-teal-500">ZeroLeak</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/dashboard" class="border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+                        <a href="/dashboard/settings.html" class="border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Settings</a>
+                        <a href="/dashboard/billing.html" class="border-brand-500 text-slate-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Billing</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="/logout" class="text-sm font-medium text-slate-500 hover:text-slate-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold mb-6 text-slate-800">Subscription & Billing</h1>
+
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium mb-2">Current Plan Status</h2>
+            <div id="status-container" class="text-sm text-slate-600 mb-4">Loading...</div>
+            
+            <div id="subscribe-section" style="display:none;" class="mt-6 border-t border-slate-200 pt-6">
+                <h3 class="text-md font-semibold mb-2 text-slate-800">Upgrade to Pro</h3>
+                <p class="text-sm text-slate-500 mb-4">Get unlimited event tracking and priority support for ₹1999/month.</p>
+                <button id="pay-btn" class="bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                    Subscribe Now
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function fetchStatus() {
+            const res = await fetch('/api/billing/status');
+            const data = await res.json();
+            
+            const container = document.getElementById('status-container');
+            const subSection = document.getElementById('subscribe-section');
+            
+            if (data.status === 'active') {
+                container.innerHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span> <p class="mt-2">You are on the Pro Plan.</p>`;
+            } else {
+                container.innerHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Trialing / Inactive</span> <p class="mt-2">Please upgrade to continue using all features.</p>`;
+                subSection.style.display = 'block';
+            }
+        }
+
+        document.getElementById('pay-btn').addEventListener('click', async () => {
+            try {
+                // You must set RAZORPAY_PLAN_ID in the .env, or send the plan ID from frontend.
+                // Assuming a dummy plan ID here to trigger the flow.
+                const res = await fetch('/api/billing/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+
+                var options = {
+                    "key": data.key_id,
+                    "subscription_id": data.subscription_id,
+                    "name": "ZeroLeak Pro",
+                    "description": "Monthly Subscription",
+                    "handler": async function (response){
+                        const verifyRes = await fetch('/api/billing/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_subscription_id: response.razorpay_subscription_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+                        const verifyData = await verifyRes.json();
+                        if (verifyData.success) {
+                            alert('Subscription Active!');
+                            window.location.reload();
+                        } else {
+                            alert('Payment Verification Failed');
+                        }
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            } catch (err) {
+                console.error(err);
+                alert("Failed to initiate payment.");
+            }
+        });
+
+        fetchStatus();
+    </script>
+</body>
+</html>

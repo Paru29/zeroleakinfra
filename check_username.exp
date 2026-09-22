@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70 "docker exec -i zeroleak_postgres psql -U postgres -d zeroleak -c \"SELECT id, length(username), username FROM tenants;\""
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect eof

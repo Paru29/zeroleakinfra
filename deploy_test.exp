@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70 "echo 'Login Successful'"
+expect {
+    "*assword:*" {
+        send "REDACTED_PASSWORD\r"
+        exp_continue
+    }
+    eof
+}

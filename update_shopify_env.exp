@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70 "cd ~/zeroleakinfra && echo 'SHOPIFY_API_KEY=REDACTED_API_KEY' >> .env && echo 'SHOPIFY_API_SECRET=shpss_REDACTED' >> .env"
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect eof

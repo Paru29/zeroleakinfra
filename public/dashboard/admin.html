@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Admin Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' } } }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg class="h-8 w-8 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-teal-500">ZeroLeak</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/dashboard/admin.html" class="border-brand-500 text-slate-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Master Admin</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="/logout" class="text-sm font-medium text-slate-500 hover:text-slate-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold mb-6 text-slate-800">Global Settings</h1>
+        
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium mb-4 text-slate-800">API Keys (Global)</h2>
+            <form id="env-form" class="space-y-4">
+                
+                <h3 class="font-semibold text-slate-700 mt-4">Razorpay (Billing)</h3>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">RAZORPAY_KEY_ID</label>
+                    <input type="text" id="razorpay_key_id" placeholder="rzp_live_..." class="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">RAZORPAY_KEY_SECRET</label>
+                    <input type="text" id="razorpay_key_secret" placeholder="Secret Key" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">RAZORPAY_PLAN_ID</label>
+                    <input type="text" id="razorpay_plan_id" placeholder="plan_xyz..." class="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border">
+                </div>
+
+                <h3 class="font-semibold text-slate-700 mt-6">Google OAuth</h3>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">GOOGLE_CLIENT_ID</label>
+                    <input type="text" id="google_client_id" placeholder="*.apps.googleusercontent.com" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">GOOGLE_CLIENT_SECRET</label>
+                    <input type="text" id="google_client_secret" placeholder="Google Secret" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700">
+                        Save & Restart Server
+                    </button>
+                </div>
+                <div id="status-msg" class="text-sm mt-2 text-center text-brand-600 font-semibold hidden"></div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        async function loadEnv() {
+            try {
+                const res = await fetch('/api/admin/env');
+                if (res.status === 401) {
+                    alert('Unauthorized: You must be Master Admin');
+                    window.location.href = '/';
+                    return;
+                }
+                const data = await res.json();
+                
+                if (data.RAZORPAY_KEY_ID) document.getElementById('razorpay_key_id').value = data.RAZORPAY_KEY_ID;
+                if (data.RAZORPAY_KEY_SECRET) document.getElementById('razorpay_key_secret').value = data.RAZORPAY_KEY_SECRET;
+                if (data.RAZORPAY_PLAN_ID) document.getElementById('razorpay_plan_id').value = data.RAZORPAY_PLAN_ID;
+                if (data.GOOGLE_CLIENT_ID) document.getElementById('google_client_id').value = data.GOOGLE_CLIENT_ID;
+                if (data.GOOGLE_CLIENT_SECRET) document.getElementById('google_client_secret').value = data.GOOGLE_CLIENT_SECRET;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.getElementById('env-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payload = {};
+            const rzp_id = document.getElementById('razorpay_key_id').value;
+            const rzp_sec = document.getElementById('razorpay_key_secret').value;
+            const rzp_plan = document.getElementById('razorpay_plan_id').value;
+            const goog_id = document.getElementById('google_client_id').value;
+            const goog_sec = document.getElementById('google_client_secret').value;
+
+            if (rzp_id && !rzp_id.includes('...')) payload.RAZORPAY_KEY_ID = rzp_id;
+            if (rzp_sec && !rzp_sec.includes('...')) payload.RAZORPAY_KEY_SECRET = rzp_sec;
+            if (rzp_plan && !rzp_plan.includes('...')) payload.RAZORPAY_PLAN_ID = rzp_plan;
+            if (goog_id && !goog_id.includes('...')) payload.GOOGLE_CLIENT_ID = goog_id;
+            if (goog_sec && !goog_sec.includes('...')) payload.GOOGLE_CLIENT_SECRET = goog_sec;
+
+            try {
+                const msg = document.getElementById('status-msg');
+                msg.textContent = 'Saving...';
+                msg.style.display = 'block';
+
+                const res = await fetch('/api/admin/env', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    msg.textContent = 'Saved! Server is restarting, please wait...';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 4000); // give time for docker to restart
+                } else {
+                    msg.textContent = 'Error: ' + data.error;
+                    msg.className = 'text-sm mt-2 text-center text-red-600 font-semibold';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to save settings');
+            }
+        });
+
+        loadEnv();
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+root@187.127.152.70's password: 
+Welcome to Ubuntu 26.04.1 LTS (GNU/Linux 7.0.0-30-generic x86_64)
+
+ * Documentation:  https://docs.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+11 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+*** System restart required ***
+Last login: Mon Sep 21 19:32:47 2026 from 103.219.229.161
+root@srv1987044:~# cat /etc/nginx/sites-available/zeroleak_track | base64
+c2VydmVyIHsKICAgIHNlcnZlcl9uYW1lIHRyYWNrLnplcm9sZWFraW5mcmEudGVjaDsKICAgIGxv
+Y2F0aW9uIC8gewogICAgICAgIHByb3h5X3Bhc3MgaHR0cDovLzEyNy4wLjAuMTozMDAwOwogICAg
+ICAgIHByb3h5X3NldF9oZWFkZXIgSG9zdCBcJGhvc3Q7CiAgICAgICAgcHJveHlfc2V0X2hlYWRl
+ciBYLVJlYWwtSVAgXCRyZW1vdGVfYWRkcjsKICAgICAgICBwcm94eV9zZXRfaGVhZGVyIFgtRm9y
+d2FyZGVkLUZvciBcJHByb3h5X2FkZF94X2ZvcndhcmRlZF9mb3I7CiAgICAgICAgcHJveHlfc2V0
+X2hlYWRlciBYLUZvcndhcmRlZC1Qcm90byBcJHNjaGVtZTsKICAgIH0KCiAgICBsaXN0ZW4gNDQz
+IHNzbDsgIyBtYW5hZ2VkIGJ5IENlcnRib3QKICAgIHNzbF9jZXJ0aWZpY2F0ZSAvZXRjL2xldHNl
+bmNyeXB0L2xpdmUvdHJhY2suemVyb2xlYWtpbmZyYS50ZWNoL2Z1bGxjaGFpbi5wZW07ICMgbWFu
+YWdlZCBieSBDZXJ0Ym90CiAgICBzc2xfY2VydGlmaWNhdGVfa2V5IC9ldGMvbGV0c2VuY3J5cHQv
+bGl2ZS90cmFjay56ZXJvbGVha2luZnJhLnRlY2gvcHJpdmtleS5wZW07ICMgbWFuYWdlZCBieSBD
+ZXJ0Ym90CiAgICBpbmNsdWRlIC9ldGMvbGV0c2VuY3J5cHQvb3B0aW9ucy1zc2wtbmdpbnguY29u
+ZjsgIyBtYW5hZ2VkIGJ5IENlcnRib3QKICAgIHNzbF9kaHBhcmFtIC9ldGMvbGV0c2VuY3J5cHQv
+c3NsLWRocGFyYW1zLnBlbTsgIyBtYW5hZ2VkIGJ5IENlcnRib3QKCn0Kc2VydmVyIHsKICAgIGlm
+ICgkaG9zdCA9IHRyYWNrLnplcm9sZWFraW5mcmEudGVjaCkgewogICAgICAgIHJldHVybiAzMDEg
+aHR0cHM6Ly8kaG9zdCRyZXF1ZXN0X3VyaTsKICAgIH0gIyBtYW5hZ2VkIGJ5IENlcnRib3QKCgog
+ICAgbGlzdGVuIDgwOwogICAgc2VydmVyX25hbWUgdHJhY2suemVyb2xlYWtpbmZyYS50ZWNoOwog
+ICAgcmV0dXJuIDQwNDsgIyBtYW5hZ2VkIGJ5IENlcnRib3QKCgp9
+root@srv1987044:~# 

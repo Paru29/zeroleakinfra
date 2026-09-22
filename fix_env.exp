@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect "# "
+send "cd ~/zeroleakinfra\r"
+expect "# "
+send "echo 'SHOPIFY_API_KEY=REDACTED_API_KEY' >> .env\r"
+expect "# "
+send "echo 'SHOPIFY_API_SECRET=shpss_REDACTED' >> .env\r"
+expect "# "
+send "docker compose up -d\r"
+expect "# "
+send "exit\r"
+expect eof

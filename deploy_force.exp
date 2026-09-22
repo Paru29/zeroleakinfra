@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+set timeout 300
+
+spawn scp -o StrictHostKeyChecking=no zeroleak_deploy.tar.gz root@187.127.152.70:/root/
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect eof
+
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect "*# "
+
+send "cd /root/zeroleakinfra\r"
+expect "*# "
+
+send "tar -xzf /root/zeroleak_deploy.tar.gz\r"
+expect "*# "
+
+send "docker compose build --no-cache api worker\r"
+expect "*# "
+
+send "docker compose up -d\r"
+expect "*# "
+
+send "sleep 5\r"
+expect "*# "
+
+send "docker compose logs --tail=20 api\r"
+expect "*# "
+
+send "exit\r"
+expect eof

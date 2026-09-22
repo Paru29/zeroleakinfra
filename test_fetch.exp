@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh root@187.127.152.70 "sed -i 's/router.use(requireMasterAdmin);/router.use((req, res, next) => { console.log(\"API ADMIN CHECK:\", req.session); requireMasterAdmin(req, res, next); });/g' ~/zeroleakinfra/src/routes/admin.js && cd ~/zeroleakinfra && docker compose restart api"
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect eof

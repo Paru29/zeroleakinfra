@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "*assword:*"
+send "REDACTED_PASSWORD\r"
+expect "*# "
+send "systemctl start docker\r"
+expect "*# "
+send "systemctl enable docker\r"
+expect "*# "
+send "cd /root/zeroleakinfra && docker compose up -d --build\r"
+expect "*# "
+send "exit\r"
+expect eof

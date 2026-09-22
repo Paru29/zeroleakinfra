@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+set timeout -1
+spawn ssh -o StrictHostKeyChecking=no root@187.127.152.70
+expect "password:"
+send "REDACTED_PASSWORD\r"
+expect "# "
+send "cat /etc/nginx/sites-available/zeroleak_track | base64\r"
+expect "# "
+send "exit\r"
